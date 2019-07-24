@@ -1,7 +1,7 @@
 
 ## Running the faucet 
 
-Requires an RPC connection a running ethereum node
+Requires a RPC connection to a running ethereum node
 
 ```
 go run main.go faucet.go --network 54321 --provider "http://localhost:8545" --keystore keystore/ --address d0c38befc1cf6c126b6dac7184edad7f64ebf7e7 --password password.txt --httpport 3099

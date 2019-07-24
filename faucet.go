@@ -70,7 +70,6 @@ func (f *faucet) sendTx(tx *types.Transaction) (string, error) {
 func (f *faucet) listenAndServe() {
 	http.HandleFunc("/", f.faucetHandler)
 	http.ListenAndServe(fmt.Sprintf(":%d", f.port), nil)
-
 }
 
 type request struct {
@@ -95,12 +94,10 @@ func (f *faucet) faucetHandler(w http.ResponseWriter, r *http.Request) {
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
-		fmt.Println("New incoming faucet request for", req.Address)
 		tx, err := f.createTx(common.HexToAddress(req.Address))
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		}
-		fmt.Println("Created transaction: ", tx)
 		if tx, err = f.signTx(tx); err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		}
