@@ -14,13 +14,13 @@ RUN go mod download
 # Import the code
 COPY ./ ./ 
 
-# Build executable in /app
+# Build static executable /app
 RUN CGO_ENABLED=0 go build \
     -installsuffix 'static' \
     -o /app .
 
 # Stage 2: run container
-FROM alpine:latest AS runtime
+FROM scratch AS runtime
 
 ARG HTTP_PORT=8080
 
