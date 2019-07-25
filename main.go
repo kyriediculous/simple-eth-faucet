@@ -20,9 +20,9 @@ func main() {
 	network := flag.Int("network", -1, "chain ID")
 	provider := flag.String("provider", "http://localhost:8545", "Ethereum JSON-RPC provider")
 
-	keys := flag.String("keystore", "", "Keystore path")
+	keys := flag.String("keystore", "/keystore", "Keystore path")
 	address := flag.String("address", "", "account address to fund user requests with")
-	password := flag.String("password", "", "File containing password")
+	password := flag.String("password", "password.txt", "File containing password")
 
 	payout := flag.Int("payout", 1, "Number of Eth to pay out per request")
 

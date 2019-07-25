@@ -51,7 +51,6 @@ func (f *faucet) createTx(to common.Address) (*types.Transaction, error) {
 }
 
 func (f *faucet) signTx(tx *types.Transaction) (*types.Transaction, error) {
-	fmt.Println(*tx, f.account, f.network)
 	signedTx, err := f.wallet.SignTx(f.account, tx, f.network)
 	if err != nil {
 		return nil, err
@@ -95,16 +94,19 @@ func (f *faucet) faucetHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 		tx, err := f.createTx(common.HexToAddress(req.Address))
-		if err != nil {
+		if err != nil || tx == nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
 		}
 		if tx, err = f.signTx(tx); err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
 		}
 		var res response
 		res.TxHash, err = f.sendTx(tx)
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
 		}
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(res)
