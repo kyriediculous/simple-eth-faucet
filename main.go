@@ -30,6 +30,10 @@ func main() {
 
 	flag.Parse()
 
+	if !strings.HasPrefix(*provider, "http") {
+		*provider = "http://" + *provider
+	}
+
 	// Load up the account key and decrypt its password
 	wallet, err := unlockWallet(*address, *password, *keys)
 	if err != nil {

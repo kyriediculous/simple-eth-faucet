@@ -4,10 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"math/big"
 	"net/http"
 
 	"github.com/ethereum/go-ethereum/accounts"
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -63,6 +65,16 @@ func (f *faucet) sendTx(tx *types.Transaction) (string, error) {
 		return "", err
 	}
 
+	receipt, err := bind.WaitMined(context.Background(), f.client, tx)
+	if err != nil {
+		return "", fmt.Errorf("error waiting for tx %x: %v", tx.Hash().Hex(), err)
+	}
+
+	if receipt.Status == uint64(0) {
+		return "", fmt.Errorf("tx %x failed", tx.Hash().Hex())
+	}
+
+	log.Printf("confirmed tx %x with gasPrice = %v", tx.Hash().Hex(), tx.GasPrice().Int64())
 	return tx.Hash().Hex(), nil
 }
 
@@ -96,6 +108,7 @@ func (f *faucet) faucetHandler(w http.ResponseWriter, r *http.Request) {
 		tx, err := f.createTx(common.HexToAddress(req.Address))
 		if err != nil || tx == nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			log.Printf("Error occured: %v \n", err)
 			return
 		}
 		if tx, err = f.signTx(tx); err != nil {
@@ -106,6 +119,7 @@ func (f *faucet) faucetHandler(w http.ResponseWriter, r *http.Request) {
 		res.TxHash, err = f.sendTx(tx)
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			log.Printf("Error sending transaction: %v", err)
 			return
 		}
 		w.Header().Set("Content-Type", "application/json")
