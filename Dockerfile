@@ -26,7 +26,7 @@ ARG HTTP_PORT=8080
 
 COPY --from=builder /app /app
 COPY keystore /keystore
-COPY password.txt /password.txt
+COPY password.txt password.txt
 
 # Expose HTTP port
 EXPOSE ${HTTP_PORT}
